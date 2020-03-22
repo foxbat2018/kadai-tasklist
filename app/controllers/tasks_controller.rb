@@ -1,5 +1,4 @@
 class TasksController < ApplicationController
-  
   # アクション定義
   
   # Prefix:tasks Verb:GET  
@@ -68,7 +67,7 @@ class TasksController < ApplicationController
   private
   # Strong Parameter
   def task_params
-    params.require(:task).permit(:content)
+    params.require(:task).permit(:content, :status)
   end
     
 end
