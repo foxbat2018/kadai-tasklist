@@ -1,14 +1,17 @@
 class TasksController < ApplicationController
-  # アクション定義
+  before_action :require_user_logged_in, only: [:index, :show, :edit]
   
+  # アクション定義
   # Prefix:tasks Verb:GET  
   def index
-    @tasks = Task.all
+    #ログインユーザーに紐づくタスクのみ表示する
+    @tasks = current_user.tasks
   end  
   
   # Prefix:none Verb:POST
   def create
-    @task = Task.new(task_params)
+    #@task = Task.new(task_params)
+    @task = current_user.tasks.build(task_params)
     
     if @task.save
       flash[:success] = 'タスクが正常に登録されました'
