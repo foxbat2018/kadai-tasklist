@@ -1,8 +1,6 @@
 class TasksController < ApplicationController
-  include TasksHelper
-  
   before_action :require_user_logged_in, only: [:index, :show, :edit]
-  before_action :get_user_task, only: [:edit, :show, :update, :destroy]
+  before_action :correct_user, only: [:edit, :show, :update, :destroy]
   
   # アクション定義
   # Prefix:tasks Verb:GET  
@@ -13,7 +11,6 @@ class TasksController < ApplicationController
   
   # Prefix:none Verb:POST
   def create
-    #@task = Task.new(task_params)
     @task = current_user.tasks.build(task_params)
     
     if @task.save
@@ -71,11 +68,9 @@ class TasksController < ApplicationController
     params.require(:task).permit(:content, :status)
   end
   
-  def get_user_task
-    @task = Task.find_by(id: params[:id])
-    # 指定されたタスクがログイン中ユーザーのものでなければタスク一覧に飛ばす
-    unless current_user_task?(current_user, @task)
-      flash[:danger] = 'ログイン中ユーザー以外のタスクが指定されました。'
+  def correct_user
+    @task = current_user.tasks.find_by(id: params[:id]) 
+    unless @task
       redirect_to tasks_url
     end
   end

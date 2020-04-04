@@ -1,7 +1,5 @@
 Rails.application.routes.draw do
-  get 'sessions/new'
-  get 'sessions/create'
-  get 'sessions/destroy'
+  
   root to: "tasks#index"
   
   # ログイン処理用定義
@@ -12,6 +10,6 @@ Rails.application.routes.draw do
   # ユーザー追加用定義
   get 'signup', to: 'users#new' 
   
-  resources :users, only: [:new, :create]
+  resources :users, only: [:create]
   resources :tasks
 end
