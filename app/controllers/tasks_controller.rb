@@ -1,5 +1,8 @@
 class TasksController < ApplicationController
+  include TasksHelper
+  
   before_action :require_user_logged_in, only: [:index, :show, :edit]
+  before_action :get_user_task, only: [:edit, :show, :update, :destroy]
   
   # アクション定義
   # Prefix:tasks Verb:GET  
@@ -32,19 +35,15 @@ class TasksController < ApplicationController
   
   # Prefix:edit_task Verb:GET
   def edit
-    @task = Task.find(params[:id])    
   end
   
   # Prefix:task Verb:GET
   def show
-    @task = Task.find(params[:id])
   end
   
   
   # Prefix:none Verb:PATCH(PUT)
   def update
-    @task = Task.find(params[:id])
-    
     if @task.update(task_params)
       flash[:success] = 'タスクは正常に更新されました'
       redirect_to @task
@@ -58,7 +57,6 @@ class TasksController < ApplicationController
   
   # Prefix:none Verb:DELETE  
   def destroy
-    @task = Task.find(params[:id])
     @task.destroy
     
     flash[:success] = 'タスクは正常に削除されました'
@@ -72,5 +70,14 @@ class TasksController < ApplicationController
   def task_params
     params.require(:task).permit(:content, :status)
   end
-    
+  
+  def get_user_task
+    @task = Task.find_by(id: params[:id])
+    # 指定されたタスクがログイン中ユーザーのものでなければタスク一覧に飛ばす
+    unless current_user_task?(current_user, @task)
+      flash[:danger] = 'ログイン中ユーザー以外のタスクが指定されました。'
+      redirect_to tasks_url
+    end
+  end
+  
 end
